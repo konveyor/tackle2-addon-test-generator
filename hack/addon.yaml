@@ -1,0 +1,9 @@
+
+
+---
+kind: Addon
+apiVersion: tackle.konveyor.io/v1alpha1
+metadata:
+  name: testgen
+spec:
+  image: quay.io/maufart/tackle2-addon-test-generator
