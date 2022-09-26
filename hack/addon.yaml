@@ -6,4 +6,4 @@ apiVersion: tackle.konveyor.io/v1alpha1
 metadata:
   name: testgen
 spec:
-  image: quay.io/maufart/tackle2-addon-test-generator
+  image: quay.io/konveyor/tackle2-addon-test-generator

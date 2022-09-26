@@ -1,4 +1,8 @@
-# originaly from https://github.com/konveyor/tackle-test-generator-cli/blob/main/setup.py
+#
+# File originaly from https://github.com/konveyor/tackle-test-generator-cli/blob/main/setup.py
+#
+# TODO: Required dependencies list should be minimized more if possible (L30-48).
+#
 
 import tkltest
 from setuptools import setup, find_packages
