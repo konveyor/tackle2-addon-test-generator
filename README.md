@@ -1,3 +1,5 @@
+[![Docker Repository on Quay](https://quay.io/repository/konveyor/tackle2-addon-test-generator/status "Docker Repository on Quay")](https://quay.io/repository/konveyor/tackle2-addon-test-generator)
+
 # Development of Tackle2 addon with test generator
 
 The tool which should be implemented as an addon: https://github.com/konveyor/tackle-test-generator-cli

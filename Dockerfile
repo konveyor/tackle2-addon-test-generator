@@ -30,6 +30,9 @@ RUN wget -qO /opt/tackle-test-generator-cli.zip $TESTGEN \
  && unzip /opt/tackle-test-generator-cli.zip -d /opt \
  && rm /opt/tackle-test-generator-cli.zip
 
+# Override setup.py with custom versions with limited dependencies (test unit-only)
+COPY hack/setup.py /opt/tackle-test-generator-cli/
+
 # Install tkltest-unit
 RUN cd /opt/tackle-test-generator-cli && pip3 install --editable .
 
