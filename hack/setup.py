@@ -8,7 +8,7 @@ import tkltest
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 
-
+# TODO: Need to optimize dependencies that are installed
 class TkltestInstall(install):
     """Install and download nltk data"""
     def run(self):
