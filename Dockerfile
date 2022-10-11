@@ -10,13 +10,8 @@ RUN echo -e "[centos8]" \
  "\nbaseurl = http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/" \
  "\nenabled = 1" \
  "\ngpgcheck = 0" > /etc/yum.repos.d/centos.repo
-RUN echo -e "[WandiscoSVN]" \
- "\nname=Wandisco SVN Repo" \
- "\nbaseurl=http://opensource.wandisco.com/centos/6/svn-1.9/RPMS/$basearch/" \
- "\nenabled=1" \
- "\ngpgcheck=0" > /etc/yum.repos.d/wandisco.repo
 RUN microdnf -y install \
-  java-11-openjdk-headless \
+  java-11-openjdk-devel \
   openssh-clients \
   unzip \
   wget \
@@ -27,21 +22,22 @@ RUN microdnf -y install \
  && microdnf -y clean all
 ARG TESTGEN=https://github.com/konveyor/tackle-test-generator-cli/releases/download/v2.4.0/tackle-test-generator-cli-v2.4.0-all-deps.zip
 RUN wget -qO /opt/tackle-test-generator-cli.zip $TESTGEN \
- && unzip /opt/tackle-test-generator-cli.zip -d /opt \
+ && unzip /opt/tackle-test-generator-cli.zip -x */tackle-test-generator-ui-main-SNAPSHOT-jar-with-dependencies.jar -d /opt \
  && rm /opt/tackle-test-generator-cli.zip
 
 # Override setup.py with custom versions with limited dependencies (test unit-only)
 COPY hack/setup.py /opt/tackle-test-generator-cli/
 
 # Install tkltest-unit
+RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 RUN cd /opt/tackle-test-generator-cli && pip3 install --editable .
-
-# Install tkltest-unit within python venv
-##RUN cd /opt/tackle-test-generator-cli && python3 -m venv venv && source venv/bin/activate && pip install --editable . && tkltest-unit
-##RUN cd /opt/tackle-test-generator-cli && python3 -m venv venv && source venv/bin/activate && tkltest-unit --help
 
 WORKDIR /working
 COPY --from=builder /opt/app-root/src/bin/addon /usr/local/bin/addon
+
+RUN alternatives --set java java-11-openjdk.x86_64
+RUN alternatives --set javac java-11-openjdk.x86_64
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk/
 
 # Test availability of tkltest-unit
 RUN tkltest-unit --help
