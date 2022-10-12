@@ -20,7 +20,12 @@ RUN microdnf module enable maven:3.6 \
   subversion \
   maven \
   python39 \
+  python39-lxml \
+  python39-numpy \
+  python39-psutil \
   python39-pip \
+  python39-scipy \
+  python39-pyyaml \
   python39-setuptools \
  && microdnf -y clean all
 
