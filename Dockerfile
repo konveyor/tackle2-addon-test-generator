@@ -1,27 +1,32 @@
-FROM registry.access.redhat.com/ubi8/go-toolset:1.16.12 as builder
+FROM registry.access.redhat.com/ubi9/go-toolset:latest as builder
 ENV GOPATH=$APP_ROOT
 COPY --chown=1001:0 . .
 RUN make cmd
 
-FROM registry.access.redhat.com/ubi8/ubi-minimal
+FROM registry.access.redhat.com/ubi9/ubi-minimal
 USER root
-RUN echo -e "[centos8]" \
- "\nname = centos8" \
- "\nbaseurl = http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/" \
+RUN echo -e "[centos9]" \
+ "\nname = centos9" \
+ "\nbaseurl = http://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/" \
  "\nenabled = 1" \
  "\ngpgcheck = 0" > /etc/yum.repos.d/centos.repo
-RUN microdnf module enable maven:3.6 \
- && microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
+RUN microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
+  ant \
+  ant-junit \
+  git \
   java-11-openjdk-devel \
+  maven \
   openssh-clients \
+  python3 \
+  python3-lxml \
+  python3-numpy \
+  python3-psutil \
+  python3-pip \
+  python3-scipy \
+  python3-setuptools \
+  subversion \
   unzip \
   wget \
-  git \
-  subversion \
-  maven \
-  python39 \
-  python39-pip \
-  python39-setuptools \
  && microdnf -y clean all
 
 ARG TESTGEN=https://github.com/konveyor/tackle-test-generator-cli/releases/download/v2.4.0/tackle-test-generator-cli-v2.4.0-all-deps.zip
