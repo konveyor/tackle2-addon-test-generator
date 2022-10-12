@@ -10,7 +10,8 @@ RUN echo -e "[centos8]" \
  "\nbaseurl = http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/" \
  "\nenabled = 1" \
  "\ngpgcheck = 0" > /etc/yum.repos.d/centos.repo
-RUN microdnf -y install \
+RUN microdnf module enable maven:3.6 \
+ && microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
   java-11-openjdk-devel \
   openssh-clients \
   unzip \
@@ -19,7 +20,10 @@ RUN microdnf -y install \
   subversion \
   maven \
   python39 \
+  python39-pip \
+  python39-setuptools \
  && microdnf -y clean all
+
 ARG TESTGEN=https://github.com/konveyor/tackle-test-generator-cli/releases/download/v2.4.0/tackle-test-generator-cli-v2.4.0-all-deps.zip
 RUN wget -qO /opt/tackle-test-generator-cli.zip $TESTGEN \
  && unzip /opt/tackle-test-generator-cli.zip -x */tackle-test-generator-ui-main-SNAPSHOT-jar-with-dependencies.jar -d /opt \
@@ -29,14 +33,12 @@ RUN wget -qO /opt/tackle-test-generator-cli.zip $TESTGEN \
 COPY hack/setup.py /opt/tackle-test-generator-cli/
 
 # Install tkltest-unit
-RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
-RUN cd /opt/tackle-test-generator-cli && pip3 install --editable .
+RUN pip3 install --no-cache-dir torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+RUN cd /opt/tackle-test-generator-cli && pip3 install --no-cache-dir --editable .
 
 WORKDIR /working
 COPY --from=builder /opt/app-root/src/bin/addon /usr/local/bin/addon
 
-RUN alternatives --set java java-11-openjdk.x86_64
-RUN alternatives --set javac java-11-openjdk.x86_64
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk/
 
 # Test availability of tkltest-unit
