@@ -4,102 +4,91 @@ import (
 	"bufio"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
-	pathlib "path"
+	"path"
 
 	"github.com/konveyor/tackle2-addon/command"
-	"github.com/konveyor/tackle2-hub/api"
 	"github.com/pelletier/go-toml/v2"
 )
 
-//
 // tkltest application analyzer.
 type Tkltest struct {
-	application *api.Application
-	*Data
+	appName string
+	*TackleTestConfig
+}
+
+type General struct {
+	AppName       string `json:"-" toml:"app_name"`
+	TestDirectory string `json:"test_directory" toml:"test_directory"`
+}
+
+type Generate struct {
+	AppBuildFiles     []string `json:"app_build_files,omitempty" toml:"app_build_files,omitempty"`
+	TargetClassList   []string `json:"target_class_list,omitempty" toml:"target_class_list,omitempty"`
+	ExcludedClassList []string `json:"excluded_class_list,omitempty" toml:"excluded_class_list,omitempty"`
+	TimeLimit         int      `json:"time_limit,omitempty" toml:"time_limit,omitempty"`
+}
+
+type TackleTestConfig struct {
+	General  General  `json:"general" toml:"general"`
+	Generate Generate `json:"generate" toml:"generate"`
 }
 
 // Run tkltest add on
-func (r *Tkltest) Run() (err error) {
+func (r *Tkltest) Run() error {
 
-	_ = r.BuildConfig()
+	// get the app name from the application
+	r.TackleTestConfig.General.AppName = r.appName
 
-	cmd := command.Command{Path: "tkltest-unit"}
-	cmd.Dir = r.application.Bucket
-	cmd.Options, err = r.options()
+	configTOML, err := toml.Marshal(&r.TackleTestConfig)
 	if err != nil {
 		return err
 	}
-	err = cmd.Run()
+
+	tkltestConfig := path.Join(AppDir, TKLTEST_CONFIG_FILE)
+	err = ioutil.WriteFile(tkltestConfig, configTOML, 0)
 	if err != nil {
-		fmt.Println(err.Error())
+		return err
+	}
+	addon.Activity("[TklTest] created config: %s.", tkltestConfig)
+	addon.Increment()
+	fmt.Println(string(configTOML))
+
+	// Mvn compile
+	mvnCommand := command.Command{Path: "mvn"}
+	mvnCommand.Dir = AppDir
+	mvnCommand.Options.Add("compile")
+	err = mvnCommand.Run()
+	if err != nil {
+		return err
+	}
+	addon.Increment()
+
+	// Run tkltest-unit
+	tklTestCommand := command.Command{Path: "tkltest-unit"}
+	tklTestCommand.Dir = AppDir
+	tklTestCommand.Options = command.Options{"--verbose"}
+	tklTestCommand.Options.Add("generate")
+	tklTestCommand.Options.Add("ctd-amplified")
+	err = tklTestCommand.Run()
+	if err != nil {
 		r.reportLog()
-	} else {
 		return err
 	}
 
-	return
+	addon.Activity("[TklTest] testcases generated.")
+	addon.Increment()
+	return nil
 }
 
-func (r *Tkltest) BuildConfig() (err error) {
-
-	if r.Data.General.JavaJDKHome == "" {
-		r.Data.General.JavaJDKHome = JavaHome
-	}
-	for i, path := range r.Data.General.MonolithAppPath {
-		r.Data.General.MonolithAppPath[i] = pathlib.Join(AppDir, path)
-	}
-	if r.Data.General.AppClasspathFile != "" {
-		r.Data.General.AppClasspathFile =  pathlib.Join(AppDir, r.Data.General.AppClasspathFile)
-	}
-	for i, path := range r.Data.Generate.AppBuildFile {
-		r.Data.Generate.AppBuildFile[i] = pathlib.Join(AppDir, path)
-	}
-
-	data, err := toml.Marshal(&r.Data)
-
-	if err != nil {
-
-		log.Fatal(err)
-		return err
-	}
-
-	err = ioutil.WriteFile(r.output(), data, 0)
-
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("config file created")
-	return
-}
-
-//
-// output returns output directory.
-func (r *Tkltest) output() string {
-	return pathlib.Join(
-		r.application.Bucket,
-		"config.toml")
-}
-
-func (r *Tkltest) options() (options command.Options, err error) {
-	options = command.Options{"--verbose"}
-	options.Add("--config-file", r.output())
-	options.Add("generate")
-	options.Add("ctd-amplified")
-	return
-}
-
-
-//reportLog reports the log content.
+// reportLog reports the log content.
 func (r *Tkltest) reportLog() {
-	path := pathlib.Join(
+	logPath := path.Join(
 		HomeDir,
 		".mta",
 		"log",
 		"mta.log")
-	f, err := os.Open(path)
+	f, err := os.Open(logPath)
 	if err != nil {
 		return
 	}

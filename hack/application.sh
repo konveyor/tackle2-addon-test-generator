@@ -1,9 +1,14 @@
+#!/bin/bash
+
+host="${host:-localhost:8080}"
+
 curl -X POST ${host}/applications -d \
 '{
-    "name":"test",
-    "description": "Cat application.",
+    "name":"Pathfinder",
+    "description": "Tackle Pathfinder application.",
     "repository": {
-      "kind": "git",
-      "url": "https://github.com/shashirajraja/onlinebookstore",
-    },
+      "name": "tackle-pathfinder",
+      "url": "https://github.com/djzager/tackle-pathfinder.git",
+      "branch": "main"
+    }
 }' | jq -M .
