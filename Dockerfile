@@ -7,7 +7,7 @@ FROM registry.access.redhat.com/ubi9/ubi-minimal
 USER root
 RUN echo -e "[centos9]" \
  "\nname = centos9" \
- "\nbaseurl = http://mirror.stream.centos.org/9-stream/AppStream/$basearch/os/" \
+ "\nbaseurl = http://mirror.stream.centos.org/9-stream/AppStream/\$basearch/os/" \
  "\nenabled = 1" \
  "\ngpgcheck = 0" > /etc/yum.repos.d/centos.repo
 RUN microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
