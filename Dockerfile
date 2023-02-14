@@ -10,9 +10,8 @@ RUN echo -e "[centos9]" \
  "\nmetalink = https://mirrors.centos.org/metalink?repo=centos-appstream-9-stream&arch=\$basearch&protocol=https,http" \
  "\nenabled = 1" \
  "\ngpgcheck = 0" > /etc/yum.repos.d/centos.repo
-RUN microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
-  ant \
-  ant-junit \
+RUN microdnf -y install --disablerepo=centos9 --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
+  gcc \
   git \
   java-11-openjdk-devel \
   maven \
@@ -24,9 +23,12 @@ RUN microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
   python3-pip \
   python3-scipy \
   python3-setuptools \
-  subversion \
   unzip \
   wget \
+ && microdnf -y install --setopt=install_weak_deps=0 --setopt=tsflags=nodocs \
+ ant \
+ ant-junit \
+ subversion \
  && microdnf -y clean all
 
 ARG TESTGEN=https://github.com/konveyor/tackle-test-generator-cli/releases/download/v2.4.0/tackle-test-generator-cli-v2.4.0-all-deps.zip

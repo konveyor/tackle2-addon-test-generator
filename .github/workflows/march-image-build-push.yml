@@ -19,7 +19,7 @@ jobs:
     - name: Checkout Push to Registry action
       uses: konveyor/release-tools/build-push-quay@main
       with:
-        architectures: "amd64, arm64, ppc64le, s390x"
+        architectures: "amd64, arm64"
         containerfile: "./Dockerfile"
         image_name: "tackle2-addon-test-generator"
         image_namespace: "konveyor"
