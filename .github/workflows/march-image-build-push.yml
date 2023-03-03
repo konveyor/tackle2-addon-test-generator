@@ -8,6 +8,9 @@ on:
       - 'release-*'
     tags:
       - 'v*'
+concurrency:
+  group: march-build-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   push-quay:
