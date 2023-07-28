@@ -1,4 +1,5 @@
 [![Docker Repository on Quay](https://quay.io/repository/konveyor/tackle2-addon-test-generator/status "Docker Repository on Quay")](https://quay.io/repository/konveyor/tackle2-addon-test-generator)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkonveyor%2Ftackle2-addon-test-generator.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkonveyor%2Ftackle2-addon-test-generator?ref=badge_shield)
 
 # Development of Tackle2 addon with test generator
 
@@ -17,3 +18,7 @@ Tackle 2 addon example code: https://github.com/konveyor/tackle2-addon-windup an
 ## Development notes
 
 Sample image: ```quay.io/maufart/tackle2-addon-test-generator```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fkonveyor%2Ftackle2-addon-test-generator.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fkonveyor%2Ftackle2-addon-test-generator?ref=badge_large)
